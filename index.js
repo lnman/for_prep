@@ -20,7 +20,7 @@ app.get('/greetings', function(request, response) {
   response.writeHead(200, { 'Content-Type': 'application/json' });
   var fullquery=url.parse(request.url,true);
   var query=fullquery.query;
-  var q=unescape(query.q);
+  var q=unescape(query.q||"");
   var answer="";
   for (var i = 0; i < greet.length; i++) {
     var mat=q.match(greet[i]);
@@ -43,7 +43,6 @@ app.get('/greetings', function(request, response) {
   if(answer===""){
     answer="I am not that clever to answer your question";
   }
-  
   response.end(JSON.stringify({"answer":"Hello, Kitty!"+answer}));
 });
 
@@ -55,16 +54,21 @@ app.get('/weather', function(request, response) {
   response.writeHead(200, { 'Content-Type': 'application/json' });
   var fullquery=url.parse(request.url,true);
   var query=fullquery.query;
-  var q=unescape(query.q);
+  var q=unescape(query.q||"");
   var mat=q.match(cityreg);
   if(!mat){
     response.end(JSON.stringify({"answer":"I didn't understand the question"}));
+    return;
   }
   var ppos=0;
   for (var i = mat[0].length - 2; i >= 0; i--) {
     if(mat[0][i]==' '){ppos=i+1;break;}
   };
   var parsed_var=mat[0].substr(ppos,mat[0].length-ppos-1);
+  if(!parsed_var){
+    response.end(JSON.stringify({"answer":"I didn't understand the question"}));
+    return;
+  }
   //console.log(parsed_var);
   req({
     method: 'GET',
@@ -78,7 +82,6 @@ app.get('/weather', function(request, response) {
         var pp=JSON.parse(body);
         //console.log(pp);
         var answer="";
-        //console.log("what is it");
         for (var i = 0; i < weather_type.length; i++) {
           var mat=q.match(weather_type[i]);
           if(mat){
@@ -110,14 +113,13 @@ app.get('/qa', function(request,response){
   response.writeHead(200, {'Content-Type':'application/json'});
   var fullquery=url.parse(request.url,true);
   var query=fullquery.query;
-  var q=unescape(query.q);
+  var q=unescape(query.q||"");
   req({
     method: 'GET',
     uri: 'http://quepy.machinalis.com/engine/get_query',
     qs:{
       question: q
     }
-
   },function (error, resp, body) {
       if(error){
         response.end(JSON.stringify({"answer":"failed to get query."}));
@@ -137,7 +139,6 @@ app.get('/qa', function(request,response){
             "default-graph-uri": "",
             "format": "application/sparql-results+json"
           }
-
         },function (error, resp, body) {
             if(error){
               response.end(JSON.stringify({"answer":"failed to get data."}));
@@ -155,7 +156,6 @@ app.get('/qa', function(request,response){
                   }
                 };
                 if(answer==="")answer="Your majesty! Jon Snow knows nothing! So do I!";
-
               }else answer="Your majesty! Jon Snow knows nothing! So do I!";
               response.end(JSON.stringify({"answer":answer}));
             }
