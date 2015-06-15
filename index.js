@@ -86,21 +86,22 @@ app.get('/weather', function(request, response) {
           var mat=q.match(weather_type[i]);
           if(mat){
             if(i==0){
-              answer+=pp.main.temp+" K";
+              if(pp&&pp.main&&pp.main.temp)answer+=pp.main.temp+" K";
               break;
             }
             if(i==1){
-              answer+=pp.main.humidity;
+              if(pp&&pp.main&&pp.main.humidity)answer+=pp.main.humidity;
               break;
             }
             if(i==2){
               answer+="No";
-              if(q.match("\\"+pp.weather[0].main+"\\i"))answer="Yes";
+              if(pp&&pp.weather&&pp.weather[0]&&pp.weather[0].main)if(q.match("\\"+pp.weather[0].main+"\\i"))answer="Yes";
               break;
             }
           }
         }
-      response.end(JSON.stringify({"answer":answer}));
+        if(answer==="")answer="Your majesty! Jon Snow knows nothing! So do I!";
+        response.end(JSON.stringify({"answer":answer}));
       }
     });
 });
@@ -122,7 +123,7 @@ app.get('/qa', function(request,response){
     }
   },function (error, resp, body) {
       if(error){
-        response.end(JSON.stringify({"answer":"failed to get query."}));
+        response.end(JSON.stringify({"answer":"Your majesty! Jon Snow knows nothing! So do I!"}));
       }
       else{
         var pp=JSON.parse(body);
@@ -141,7 +142,7 @@ app.get('/qa', function(request,response){
           }
         },function (error, resp, body) {
             if(error){
-              response.end(JSON.stringify({"answer":"failed to get data."}));
+              response.end(JSON.stringify({"answer":"Your majesty! Jon Snow knows nothing! So do I!"}));
             }
             else{
               //console.log(body);
