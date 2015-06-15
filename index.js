@@ -95,7 +95,7 @@ app.get('/weather', function(request, response) {
             }
             if(i==2){
               answer+="No";
-              if(pp&&pp.weather&&pp.weather[0]&&pp.weather[0].main)if(q.match("\\"+pp.weather[0].main+"\\i"))answer="Yes";
+              if(pp&&pp.weather&&pp.weather[0]&&pp.weather[0].main)if(q.match(new RegExp(pp.weather[0].main,"i")))answer="Yes";
               break;
             }
           }
