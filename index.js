@@ -125,6 +125,7 @@ app.get('/qa', function(request,response){
       else{
         var pp=JSON.parse(body);
         var sqlq=pp.queries[0].query;
+        if(!sqlq) return response.end(JSON.stringify({"answer":"Your majesty! Jon Snow knows nothing! So do I!"}));
         //console.log(sqlq);
         req({
           method: 'GET',
@@ -142,20 +143,20 @@ app.get('/qa', function(request,response){
               response.end(JSON.stringify({"answer":"failed to get data."}));
             }
             else{
+              //console.log(body);
               var pp=JSON.parse(body);
-              //console.log(pp);
               var answer="";
-              if(pp&&pp.results){
+              if(pp&&pp.results&&pp.results.bindings){
                 pp=pp.results.bindings;
-                //console.log(pp[7]);
                 for (var i = pp.length - 1; i >= 0; i--) {
-                  if(pp[i].x1["xml:lang"]==="en"){
+                  if(pp[i]&&pp[i].x1&&pp[i].x1["xml:lang"]==="en"){
                     answer=pp[i].x1.value;
                     break;
                   }
                 };
+                if(answer==="")answer="Your majesty! Jon Snow knows nothing! So do I!";
 
-              }else answer="could not find answer";
+              }else answer="Your majesty! Jon Snow knows nothing! So do I!";
               response.end(JSON.stringify({"answer":answer}));
             }
         });
